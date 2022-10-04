@@ -5,3 +5,10 @@ The Tutorial is available through this link: https://rustwasm.github.io/docs/boo
 
 `wat` extension is for S-expression based Web Assembly code
 `wasm` is the bytecode version of it
+
+
+### TODO
+
+- [ ] Implement the tests
+- [ ] Continue to learn
+- [ ] Study hashlife to improve the algorithm
