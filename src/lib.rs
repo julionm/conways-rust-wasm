@@ -44,6 +44,7 @@ impl Universe {
     fn live_neighbour_count(&self, row: u32, column: u32) -> u8 {
         let mut count = 0;
 
+        // TODO read this code again
         for delta_row in [self.height -1, 0, 1].iter().cloned() {
             for delta_col in [self.width - 1, 0, 1].iter().cloned() {
                 if delta_row == 0 && delta_col == 0 {
@@ -64,6 +65,19 @@ impl Universe {
 
 #[wasm_bindgen]
 impl Universe {
+
+    pub fn width(&self) -> u32 {
+        self.width
+    }
+
+    pub fn height(&self) -> u32 {
+        self.height
+    }
+
+    pub fn cells(&self) -> *const Cell {
+        self.cells.as_ptr()
+    }
+
     pub fn tick(&mut self) {
         let mut next = self.cells.clone();
 
