@@ -1,9 +1,10 @@
 mod utils;
 
+extern crate web_sys;
+
 use std::fmt::Display;
 use wasm_bindgen::prelude::*;
-
-extern crate web_sys;
+use web_sys::console;
 
 macro_rules! log {
     ( $( $t:tt )* ) => {
@@ -17,15 +18,20 @@ macro_rules! log {
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-#[wasm_bindgen]
-extern {
-    fn alert(s: &str);
+pub struct Timer<'a> {
+    name: &'a str
 }
 
-#[wasm_bindgen]
-pub fn greet(name: &str) {
-    unsafe {
-        alert(format!("Hello, {}!", name).as_str());
+impl<'a> Timer<'a> {
+    pub fn new(name: &'a str) -> Timer<'a> {
+        console::time_with_label(name);
+        Timer { name }
+    }
+}
+
+impl<'a> Drop for Timer<'a> {
+    fn drop(&mut self) {
+        console::time_end_with_label(self.name);
     }
 }
 
@@ -35,6 +41,15 @@ pub fn greet(name: &str) {
 pub enum Cell {
     Dead = 0,
     Alive = 1,
+}
+
+impl Cell {
+    pub fn toggle(&mut self) {
+        *self = match self {
+            Cell::Dead => Cell::Alive,
+            Cell::Alive => Cell::Dead
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -100,6 +115,9 @@ impl Universe {
 
     pub fn tick(&mut self) {
         log!("Ticked!");
+
+        let _timer = Timer::new("Universe::tick");
+
         let mut next = self.cells.clone();
 
         for row in 0..self.height {
@@ -124,8 +142,8 @@ impl Universe {
     }
 
     pub fn new() -> Universe {
-        let width = 64;
-        let height = 64;
+        let width = 128;
+        let height = 128;
 
         let cells = (0.. width * height)
             .map(|i| {
@@ -155,6 +173,11 @@ impl Universe {
     pub fn set_width(&mut self, width: u32) {
         self.width = width;
         self.cells = (0..width * self.height).map(|_| Cell::Dead).collect();
+    }
+
+    pub fn toggle_cell(&mut self, row: u32, col: u32) {
+        let idx = self.get_index(row, col);
+        self.cells[idx].toggle();
     }
 }
 
