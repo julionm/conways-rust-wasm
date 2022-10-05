@@ -3,6 +3,14 @@ mod utils;
 use std::fmt::Display;
 use wasm_bindgen::prelude::*;
 
+extern crate web_sys;
+
+macro_rules! log {
+    ( $( $t:tt )* ) => {
+        web_sys::console::log_1(&format!( $( $t )* ).into());
+    };
+}
+
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
 #[cfg(feature = "wee_alloc")]
@@ -91,6 +99,7 @@ impl Universe {
     }
 
     pub fn tick(&mut self) {
+        log!("Ticked!");
         let mut next = self.cells.clone();
 
         for row in 0..self.height {
